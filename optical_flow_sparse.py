@@ -18,7 +18,7 @@ import matplotlib.animation as animation
 import matplotlib.patches as patches
 from parula import parula_map
 
-DIR = "cut"
+DIR = "example"
 FILENAME = "FLFRAME"
 AMPRATIO = 30
 

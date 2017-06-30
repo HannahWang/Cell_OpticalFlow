@@ -2,12 +2,13 @@ from skimage import feature
 import numpy as np
 import math
 import cv2
+import os
 from os import listdir
 from os.path import isfile, isdir, join
 import itertools
 import csv
 
-DIR = "FLdata"
+DIR = "example"
 FILENAME = "FLFRAME"
 
 # load images
@@ -24,12 +25,14 @@ w = imgs[0].shape[0]
 h = imgs[0].shape[1]
 fps = 1.0
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter('video/{}_dense_output.mp4v'.format(FILENAME),fourcc, fps, (w, h))
+out = cv2.VideoWriter('{}/{}_dense_output.mp4v'.format(DIR, FILENAME),fourcc, fps, (w, h))
 
 for idx in range(1, len(imgs)):
     frame = imgs[idx]
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite("video/gray/{}.bmp".format(idx), frame_gray);
+    if not os.path.exists("{}/gray".format(DIR)):
+        os.makedirs("{}/gray".format(DIR))
+    cv2.imwrite("{}/gray/{}.bmp".format(DIR, idx), frame_gray);
 
     flow = cv2. calcOpticalFlowFarneback(old_gray, frame_gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
 
@@ -42,7 +45,9 @@ for idx in range(1, len(imgs)):
     cv2.imshow('frame', bgr)
     out.write(bgr)
     
-    cv2.imwrite("denseopticalflow/{}.bmp".format(idx), bgr)
+    if not os.path.exists("{}/denseopticalflow".format(DIR)):
+        os.makedirs("{}/denseopticalflow".format(DIR))
+    cv2.imwrite("{}/denseopticalflow/{}.bmp".format(DIR, idx), bgr)
 
     k = cv2.waitKey(30) & 0xff
     if k == 27:
