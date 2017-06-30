@@ -21,10 +21,11 @@ from parula import parula_map
 DIR = "example"
 FILENAME = "FLFRAME"
 AMPRATIO = 30
+CUTPX = 30
 
 # load images
 data_dir = "%s/data"%DIR
-imgs = [cv2.imread(join(data_dir, f))[30:-30, 30:-30] for f in sorted(listdir(data_dir)) if isfile(join(data_dir, f)) and f.find('.') != 0]
+imgs = [cv2.imread(join(data_dir, f))[CUTPX:-CUTPX, CUTPX:-CUTPX] for f in sorted(listdir(data_dir)) if isfile(join(data_dir, f)) and f.find('.') != 0]
 #imgs = [cv2.imread(join(data_dir, f)) for f in sorted(listdir(data_dir)) if isfile(join(data_dir, f)) and f.find('.') != 0]
 print(imgs[0].shape)
 csvlist = list()
@@ -38,7 +39,7 @@ lk_params = dict( winSize  = (15,15),
 old_gray = cv2.cvtColor(imgs[0], cv2.COLOR_BGR2GRAY)
 
 clusters = feature.blob_log(old_gray, min_sigma=2, max_sigma=7, threshold=0.01)
-clusters = random.sample(list(clusters), int(len(clusters)/10))
+clusters = random.sample(list(clusters), int(imgs[0].shape[0]*imgs[0].shape[1]*0.00207))
 p0 = np.array([np.array([np.array([np.float32(c[1]), np.float32(c[0])])]) for c in clusters])
 
 # Create some random colors
@@ -108,7 +109,7 @@ plt.close(fig)
 ims = []
 
 mask = np.zeros_like(imgs[0])
-cNorm  = colors.Normalize(vmin=min(displacement), vmax=max(displacement))
+cNorm  = colors.Normalize(vmin=math.log(min(displacement)+1), vmax=math.log(max(displacement)+1))
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=parula_map)
 arrows = list()
 
@@ -121,10 +122,11 @@ def update(t):
         a, b = new[2:4]
         c, d = old[2:4]
         dis = math.sqrt((a-c)**2+(b-d)**2)
-        colorVal = scalarMap.to_rgba(dis)
+        colorVal = scalarMap.to_rgba(math.log(dis+1))
         arrow = patches.Arrow(c, d, (a-c)*AMPRATIO, (b-d)*AMPRATIO, color=colorVal, width=10)
         ax.add_patch(arrow)
         arrows.append(arrow)
+
     return arrows
 
 ax.imshow(mask)
