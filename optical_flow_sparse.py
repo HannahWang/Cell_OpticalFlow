@@ -109,7 +109,7 @@ plt.close(fig)
 ims = []
 
 mask = np.zeros_like(imgs[0])
-cNorm  = colors.Normalize(vmin=math.log(min(displacement)+1), vmax=math.log(max(displacement)+1))
+cNorm  = colors.Normalize(vmin=math.log10(min(displacement)+1), vmax=math.log10(max(displacement)+1))
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=parula_map)
 arrows = list()
 
@@ -122,7 +122,7 @@ def update(t):
         a, b = new[2:4]
         c, d = old[2:4]
         dis = math.sqrt((a-c)**2+(b-d)**2)
-        colorVal = scalarMap.to_rgba(math.log(dis+1))
+        colorVal = scalarMap.to_rgba(math.log10(dis+1))
         arrow = patches.Arrow(c, d, (a-c)*AMPRATIO, (b-d)*AMPRATIO, color=colorVal, width=10)
         ax.add_patch(arrow)
         arrows.append(arrow)
@@ -138,7 +138,9 @@ cv2.destroyAllWindows()
 '''
 
 # show parula map scale
-plt.imshow(np.linspace(0, 100, 256)[None, :], aspect='auto',
+#plt.imshow(np.linspace(0, 100, 256)[None, :], aspect='auto',
+#                cmap=parula_map, extent=[min(displacement), max(displacement), 0, 256])
+plt.imshow(np.linspace(0, 2, 256)[None, :], aspect='auto',
                 cmap=parula_map, extent=[min(displacement), max(displacement), 0, 256])
 plt.show()
 
